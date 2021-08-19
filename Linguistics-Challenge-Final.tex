@@ -1,0 +1,567 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[french,english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{parskip}
+
+
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Java,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3,
+  inputencoding = utf8,  % Input encoding
+  extendedchars = true,  % Extended ASCII
+    literate      =        % Support additional characters
+      {á}{{\'a}}1  {é}{{\'e}}1  {í}{{\'i}}1 {ó}{{\'o}}1  {ú}{{\'u}}1
+      {Á}{{\'A}}1  {É}{{\'E}}1  {Í}{{\'I}}1 {Ó}{{\'O}}1  {Ú}{{\'U}}1
+      {à}{{\`a}}1  {è}{{\`e}}1  {ì}{{\`i}}1 {ò}{{\`o}}1  {ù}{{\`u}}1
+      {À}{{\`A}}1  {È}{{\'E}}1  {Ì}{{\`I}}1 {Ò}{{\`O}}1  {Ù}{{\`U}}1
+      {ä}{{\"a}}1  {ë}{{\"e}}1  {ï}{{\"i}}1 {ö}{{\"o}}1  {ü}{{\"u}}1
+      {Ä}{{\"A}}1  {Ë}{{\"E}}1  {Ï}{{\"I}}1 {Ö}{{\"O}}1  {Ü}{{\"U}}1
+      {â}{{\^a}}1  {ê}{{\^e}}1  {î}{{\^i}}1 {ô}{{\^o}}1  {û}{{\^u}}1
+      {Â}{{\^A}}1  {Ê}{{\^E}}1  {Î}{{\^I}}1 {Ô}{{\^O}}1  {Û}{{\^U}}1
+      {œ}{{\oe}}1  {Œ}{{\OE}}1  {æ}{{\ae}}1 {Æ}{{\AE}}1  {ß}{{\ss}}1
+      {ç}{{\c c}}1 {Ç}{{\c C}}1 {ø}{{\o}}1  {å}{{\r a}}1 {Å}{{\r A}}1
+      {ñ}{{\~n}}1  {Ñ}{{\~N}}1  {¿}{{?`}}1  {¡}{{!`}}1 {'}{\textquoteright}1
+      {°}{{\textdegree}}1 {º}{{\textordmasculine}}1 {ª}{{\textordfeminine}}1
+      % ¿ and ¡ are not correctly displayed if inconsolata font is used
+      % together with the lstlisting environment. Consider typing code in
+      % external files and using \lstinputlisting to display them instead.  
+}
+
+\title{Linguistics Challenge}
+\author{Alexandre Pinel}
+\date{February 2021}
+
+\begin{document}
+
+\maketitle
+
+\section{Tasks}
+
+CFG, written using the JSGF, used in this challenge: 
+
+\begin{lstlisting}
+#JSGF V1.0 utf-8 en;
+grammar music_play;
+
+public <music_play> =
+  [can you] (put on | play) (<artist> | <song>);
+  
+<artist> =
+  beatles |
+  radio head |
+  cake |
+  pink floyd;
+  
+<song> =
+  confortably numb |
+  paranoid android |
+  let it be |
+  hey jude;
+\end{lstlisting}
+
+\subsection{Task 1}
+
+\subsubsection{Question 1}
+
+\emph{Question 1: Extend the above grammar to cover the following kind of utterances (Don’t worry about overgenerating while introducing the productions.):}\\
+
+\begin{lstlisting}
+[i want to listen to]<unk> [jazz]<genre> [music]<unk>
+[play me]<unk> [ummagumma]<album> [by]<unk> [pink floyd]<artist>
+\end{lstlisting}
+
+\subsubsection{Answer to Question 1}
+
+Let us extend the above grammar: 
+
+\emph{Let us first start with the first part of the rule}
+
+\begin{lstlisting}
+#JSGF V1.0 utf-8 en;
+grammar music_play;
+
+/*
+ // Let's start by adding [I want to listen to] and [play me] to the rule
+ // [can you] is optional, the program will work if the user just says "put on | play"
+ // The user MUST say EITHER "I want to listen to" or "put on | play", since the command "play" works on its own, [me] is optional
+*/
+
+// Therefore, we can modify the first part of the rule such as: 
+
+ public <music_play> =
+  (I want to listen to | [can you] (put on | play [me])) (<artist> | <song>);
+\end{lstlisting}
+
+\emph{Let us now extend the second part of the \textless music\_play\textgreater\ rule. }
+
+New rules are introduced: \textless genre\textgreater\ and \textless album\textgreater. Let us first add the two newly introduced rules to the code. As mentioned in the JSGF specifications, "the order of definition of rules is not significant".
+
+\begin{lstlisting}
+#JSGF V1.0 utf-8 en;
+grammar music_play;
+
+ public <music_play> =
+  (I want to listen to | [can you] (put on | play [me])) (<artist> | <song>);
+
+// The two newly introduced rules may be added here or after <artist> and <song>
+// Definition of the new rule <genre>
+
+<genre> = 
+  jazz;
+  
+// definition of the new rule <album>
+
+<album> = 
+  ummagumma;
+
+<artist> =
+  beatles |
+  radio head |
+  cake |
+  pink floyd;
+  
+<song> =
+  confortably numb |
+  paranoid android |
+  let it be |
+  hey jude;
+  
+\end{lstlisting}
+
+We have now defined the two newly introduced rules. We may now modify the second part of the \textless music\_play\textgreater\ rule.
+
+Now, the user will be able to say they want to listen to either an artist, a song, a genre (which could be jazz, or jazz [music], where the word "music" is optional) or an album by an artist. Let us thus create a rule which will include all those options and call it "music":
+
+\begin{lstlisting}
+#JSGF V1.0 utf-8 en;
+grammar music_play;
+
+// The user MUST use one of the rules used in the <music rules> so () are necessary.
+
+ public <music_play> =
+  (I want to listen to | [can you] (put on | play [me])) ( <music> );
+  
+
+// <music> rule definition
+
+<music> = 
+  <artist> |
+  <song> | 
+  <genre> | 
+  <album> by <artist>;
+
+<genre> = 
+  jazz;
+
+
+<album> = 
+  ummagumma;
+
+<artist> =
+  beatles |
+  radio head |
+  cake |
+  pink floyd;
+  
+<song> =
+  confortably numb |
+  paranoid android |
+  let it be |
+  hey jude;
+  
+\end{lstlisting}
+
+\subsubsection{Question 2}
+
+\emph{Question 2: Do you see any limitations on how the above grammar could scale up, as you keep adding entities to
+provide coverage for building the final statistical models? Shortly report them if any, and share some ideas to possibly overcome them.}
+
+\subsubsection{Answer to Question 2}
+
+\paragraph{Overgeneration and undergeneration}\mbox{}
+
+One of the limitations on how the above grammar could scale up, as new entities are added to provide coverage for building the final statistical models, is mentioned in the first question: overgeneration. While we did not need to worry about overgeneration in the first question, it is a significant issue when hand-coding grammars (Atwell et al., 1995; Ehrbach, 1992; Gardent et al., 2007).
+
+Ideally, a grammar should be generative and describe "all and only the sentences of the language it describes" (Gardent et al., 2007). However, in practice, a hand-coded grammar will often be either undergenerative which means that its coverage will not be sufficient or it will be overgenerative which means generated strings will be too numerous.
+
+\paragraph{Possible solutions in our case}\mbox{}
+
+In our simple speech recognition program, we can easily see how overgeneration and undergeneration issues could be relevant. At the moment, it is undergenerative in the sense that many sentences are not covered at all. What if the user started their request with the following? 
+
+\begin{itemize}
+    \item Could you please...
+    \item I would like to listen to...
+\end{itemize}
+
+We could refactor our \textless music\_play\textgreater\ rule. Its first part could be divided into several smaller rules such as \textless polite\textgreater\ or \textless play\_request\textgreater\  to include a more extensive list of words such as "please", "could you" or "I would like to". 
+
+The "album [by] artist" part could also be refactored so that the user would just have to say either one or the other or both. 
+
+Finally, a much better way of organizing our program would be to import rules from other files instead of having them all in one single file. With four artists and four songs, the structure is simple. If we had thousands or more songs, importing them into the rule "song" from another file would be better. We could imagine something like: 
+
+\begin{lstlisting}
+/* import <music> is illegal in JSGF, a fully qualified name must be used. Therefore, we would need to use fully qualified rulenames. Therefore, the following rulenames are for illustration purposes
+*/
+import <com.sun.speech.app.playmusicapp.polite>;
+import <com.sun.speech.app.playmusicapp.music>;
+import <com.sun.speech.app.playmusicapp.genre>;
+import <com.sun.speech.app.playmusicapp.album>;
+import <com.sun.speech.app.playmusicapp.artist>;
+import <com.sun.speech.app.playmusicapp.song>;
+
+/* another way of doing it would be by importing all public rules such as:
+import <com.sun.speech.app.playmusicapp.*>;
+*/
+
+#JSGF V1.0 utf-8 en;
+grammar music_play;
+
+public <music_play> = 
+    ( <request> ) ( <music> ); // the code is much more readable and we can now even export <music_play> to other files.
+
+
+
+\end{lstlisting}
+
+\subsection{Part Two}
+
+\emph{Question 1: Once you’ve completed task 1, please localize the final JSGF (with all the additions) in your native
+language.}
+
+\subsubsection{Preliminary remark regarding multilingual applications}
+
+As mentioned in the documentation, the JSGF "allows multilingual grammars but most recognizers operate monolingually so a typical grammar will contain only one language".  Therefore, for our localized program, we could imagine having file structures such as: 
+
+\begin{lstlisting}
+import <com.sun.speech.app.playmusicapp.english.musicPlay>;
+import <com.sun.speech.app.playmusicapp.french.ecouterMusique>;
+\end{lstlisting}
+
+Besides, in a localized application, we could make an extensive use of tags, for example: 
+
+\begin{lstlisting}
+<country> = Belgium {BE} | France {FR} | Germany {GER} | Luxembourg {LU} // etc.
+\end{lstlisting}
+
+Tags make the code easier to maintain and different localized versions can have the same tags:
+
+\begin{lstlisting}
+
+// in English Grammar
+<polite> = (Please) {politeness}
+// in French Grammar
+<polite> = (S'il vous plaît | S'il te plaît) {politeness}
+// in German Grammar
+<polite> = (Bitte) {politeness} // etc.
+\end{lstlisting}
+
+\subsubsection{Answer to Question 1}
+
+Now, let us start with our localized program. I am a native speaker of French so it will be localized in French. For this question, we use the program we had to complete in the previous section, which does not include the improvements we suggested in Section 1 Question 2 (1.1.3). We first localize the version we made in the frame of the first question of the first section. We will provide a much better version in the next question.
+
+\paragraph{Localized in French}\mbox{}
+
+\begin{lstlisting}
+// CHANGE ENCODING - IMPORTANT
+#JSGF V1.0 ISO-8859-1 FR;
+
+grammar music_play;
+
+/*
+    for the purpose of this small localization and better code readability, we rename our rules to match the language by adding _fr to them
+*/
+
+/* First we need to localize the first part of the app
+  "I want to listen to" is "Je veux écouter" in French and [can you] (put on | play [me]) become, resp.:
+  
+  * "peux-tu" -- Note: in French, "can you" can translate as "peux-tu" or "pouvez-vous" (polite form) but nobody would ever use the polite form when talking to a speech recognition app, therefore we can omit here in this localized version. We could add it in a more complete version of the program for a better coverage, but it does not sound natural at all
+  
+  * "put on" works in French and is translated as "mettre", "play me" does not work but "me mettre" (lit. "put me on" does) 
+  
+  * "mets-moi" is a synonym of "me mettre" so we have to include it as well
+  
+  * "mettre", alone, is also something used by French-speaking people in the context of speech recognition, for example with Siri, Alexa and Google Assistant
+  
+  So the localized version is:
+*/
+
+ public <music_play_fr> =
+  (Je veux écouter | [peux-tu] [me] mettre | mets-moi) ( <music_fr> );
+  
+
+
+/* Remarks regarding the localized <music> rule
+   In French, "by" can be "de" or "par", singular (e.g. de Radio Head), or "des", plural (e.g. des Beatles).
+   That is the only thing we need to change in the <music> rule
+*/
+
+/* Since "de", "des" or "par" is necessary in <album> (de | par | des) <artist>, it is better to make a new rule for it in order to avoid potential precedence issues caused by parentheses.
+
+   Let us name it <albumby_fr>
+*/
+
+<albumby_fr> = 
+  <album> (de | par | des) <artist>;
+
+// replacement in the <music> rule
+
+<music_fr> = 
+  <artist_fr> |
+  <song_fr> | 
+  <genre_fr> | 
+  <albumby_fr>;
+
+
+// We are lucky, none of these rules change in French except "du jazz"
+// Still better to rename the variables so we know we are in the localized program
+
+<genre_fr> = 
+  du jazz;
+
+
+<album_fr> = 
+  ummagumma;
+
+<artist_fr> =
+  beatles |
+  radio head |
+  cake |
+  pink floyd;
+  
+<song_fr> =
+  confortably numb |
+  paranoid android |
+  let it be |
+  hey jude;
+\end{lstlisting}
+
+\emph{Question 2: Feel free to add everything you think could be most helpful to improve the quality of generated utterances in your language.}
+
+\subsubsection{Answer to Question 2}
+
+\paragraph{Localization with improvements}\mbox{}
+
+\begin{lstlisting}
+#JSGF V1.0 ISO-8859-1 FR;
+
+grammar music_play;
+
+ public <music_play_fr> =
+  ( <request_fr> ) ( <music_fr> );
+  
+  /*
+    As we can see, the first part of the rule <music_play_fr> quickly becomes chaotic due to the wider range of options which exist to make a request. Therefore, let us create a <request_fr> rule and refactor our code
+  */
+  
+  /* <request_fr> definition and extending the grammar to cover most options, including those which do not have an equivalent in English (e.g. "S'il vous plaît" and "S'il te plaît", "Peux-tu" and "Pouvez-vous"). We group elements of the same category together since it has to be one or the other.
+  We also have to keep the () precedence rule in mind
+  */
+  
+  /*
+    we also add a new rule for "please" since it can be put at the beginning, in the middle or at the end of a sentence, it will improve code readability. The user may not say it so it is not mandatory and always in []
+  */
+  
+  <please_fr> = 
+    [s'il te plaît] |
+    [s'il vous plaît]
+    
+    /* the <request_fr> quickly becomes chaotic if we try to include all the most common options
+    we need to divide it into even more rules
+  */
+  
+  <canyou_fr> = 
+    peux-tu [me] |
+    pouvez-vous [me] |
+    tu peux [me] |
+    vous pouvez [me];
+    
+    <want_fr> =
+      (je veux | j'aimerais) [bien];
+      
+      <put_fr> =
+      mets |
+      mettre;
+    
+    /* code sample without using extra rules
+    
+      <request_fr> = 
+    [[Peux-tu] [me] | [Pouvez-vous] [s'il te plaît] [me] | [Est-ce que tu peux] [me] | [Est-ce que vous pouvez] [me] | [tu peux] [me] | [vous pouvez] [me]) (mettre) |
+    (mets | mettez) [moi] |
+    ([J'aimerais] [Je veux] [bien] écouter
+    
+    and so on and so on... UNREADABLE!
+    And now with separate rules:
+    */
+  
+<request_fr> = 
+  ([<canyou_fr>] [<please_fr>] | [Est-ce que <canyou_fr>]) (<put_fr>) [please_fr]) |
+  (<put_fr>) [moi] |
+  [<want_fr>]  écouter;
+
+<albumby_fr> = 
+  <album> (de | par | des) <artist>;
+
+<music_fr> = 
+  <artist_fr> |
+  <song_fr> | 
+  <genre_fr> | 
+  <albumby_fr>;
+
+<genre> = 
+  du jazz;
+
+<album_fr> = 
+  ummagumma;
+
+<artist_fr> =
+  beatles |
+  radio head |
+  cake |
+  pink floyd;
+  
+<song_fr> =
+  confortably numb |
+  paranoid android |
+  let it be |
+  hey jude;
+\end{lstlisting}
+
+\paragraph{Even better version and without comments: }\mbox{}
+
+The previous localized program looks messy with all the comments. Besides, there is a trick to improve it even more by making use of Unary Operators. Indeed, if we put "est-ce que" in the same rule as "canyou fr", we can take advantage of the + operator which means a rule can be repeated \emph{one or more times} (whereas the Kleene Star * means a rule can be repeated zero or more times).
+
+Let us have a look at this final, clean and optimized version:
+
+\begin{lstlisting}
+#JSGF V1.0 ISO-8859-1 FR;
+
+grammar music_play;
+
+// first + op here, one more in request_fr
+
+ public <music_play_fr> =
+  ( <request_fr> ) ( <music_fr> )+ [please_fr];
+
+  // French grammar elements
+  
+  <please_fr> = 
+    [s'il te plaît] |
+    [s'il vous plaît]
+    
+    // note how we also nest the "please" rule in the "canyou" rule
+  
+  <canyou_fr> = 
+    peux-tu [me] |
+    pouvez-vous [me] |
+    tu peux [me] |
+    vous pouvez [me] |
+    est-ce que |
+    <please_fr>;
+    
+    <want_fr> =
+      (je veux | j'aimerais) [bien];
+      
+      <put_fr> =
+      mets |
+      mettre;
+      
+      // trick with unary operator + 
+      
+  <request_fr> = 
+    ([<canyou_fr>+] | [<canyou_fr>+]) (<put_fr>) [moi] [please_fr]) |
+    [<want_fr>]  écouter;
+    
+    // music elements
+    
+<by_fr> =
+  de |
+  par |
+  des;
+
+<albumby_fr> = 
+  <album> (<by_fr>) <artist>;
+
+<music_fr> = 
+  <artist_fr> |
+  <song_fr> | 
+  <genre_fr> | 
+  <albumby_fr>;
+
+<genre> = 
+  du jazz;
+
+<album_fr> = 
+  ummagumma;
+
+<artist_fr> =
+  beatles |
+  radio head |
+  cake |
+  pink floyd;
+  
+<song_fr> =
+  confortably numb |
+  paranoid android |
+  let it be |
+  hey jude;
+\end{lstlisting}
+
+\emph{Question 3: Provide us with some sample utterances the JSGF is able to produce along with the localized
+grammar.}
+
+\subsubsection{Answer to Question 3}
+
+Finally, let us see a few sample utterances the JSGF is able to produce with the localized grammar:
+
+\begin{lstlisting}
+/*
+    In the following examples, like in English, <unk> is often necessary in that position for strings which are not part of the grammar. Non SVO-languages may face different problematics.
+*/
+
+/*
+  Since all the rules are now nested in either <music_fr> or <request_fr>, we only use them.
+*/
+
+// First example
+[est-ce que tu peux me mettre]<request_fr> <unk> [hey jude des beatles]<music_fr> [s'il te plait]<please_fr>
+// Second example
+[mettre]<request_fr> <unk> [the beatles]<music_fr>
+// Third example
+[pouvez-vous mettre]<request_fr> <unk> [du jazz]<music_fr> [s'il vous plaît]<please_fr>
+// Fourth example
+// note how we can use "song by artist" now as well as "album by artist" thanks to the + operator
+[j'aimerais bien écouter]<request_fr> [comfortably numb de Pink Floyd]
+\end{lstlisting}
+
+\section{Sources}
+
+\begin{itemize}
+    \item Atwell, E., Churcher, G. and Souter, C., 1995. Developing a corpus-based grammar model within a continuous commercial speech recognition package.
+    \item Erbach, G., 1992, March. Tools for grammar engineering. In Third Conference on Applied Natural Language Processing (pp. 243-244).
+  \item Gardent, C., Kow. E., Spotting Overgeneration Suspects. 11th European Workshop on Natural
+Language Generation - ENLG’07, Jun 2007, Schloss Dagstuhl, Germany. (pp.41-48).
+ 
+\end{itemize}
+
+\end{document}
